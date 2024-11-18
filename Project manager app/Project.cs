@@ -14,12 +14,12 @@ namespace Project_manager_app
         public DateTime EndDate { get; set; }
         public ProjectStatus Status { get; set; }
 
-        public Project(string name)
+        public Project(string name, string description, DateTime start, DateTime end)
         {
             Name = name;
-            Description = "";
-            StartDate = DateTime.Now.Date;
-            EndDate = DateTime.Now.Date;
+            Description = description;
+            StartDate = start;
+            EndDate = end;
             Status = ProjectStatus.Active;
         }
 

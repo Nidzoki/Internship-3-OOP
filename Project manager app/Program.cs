@@ -6,14 +6,22 @@ using System.Threading.Tasks;
 
 namespace Project_manager_app
 {
-    internal class Program
+    public class Program
     {
-        static void Main(string[] args)
+        static void Main()
         {
-            Project p = new Project("Novi projekt");
+            var projectsDictionary = new Dictionary<Project, List<Task>>();
+            var appInterface = new AppInterface();
+            var quit = false;
 
-            p.PrintProjectInfo();
+            while (!quit)
+            {
+                if(appInterface.MainMenu(ref projectsDictionary) == "Exit")
+                    quit = true;
+            }
 
+            Console.Clear();
+            Console.WriteLine("\n Exiting project manager app...\n\n Press any key to continue...");
             Console.ReadKey();
         }
     }
