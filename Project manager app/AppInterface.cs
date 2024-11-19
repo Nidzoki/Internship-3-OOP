@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -37,9 +38,11 @@ namespace Project_manager_app
                     EvaluateProjectDeletionSuccess(ref projects);
                     return " Exiting project deletion...";
                 case "4":
-                    return " You have selected -> Show all tasks with a deadline in the next 7 days"; // not yet implemented
+                    DisplayTasksInNextSevenDays(projects); // needs to be tested when add tasks has been implemented
+                    return " Exiting next 7 days tasks display...";
                 case "5":
-                    return " You have selected -> Display projects filtered by status"; // not yet implemented
+                    DisplayProjectsByStatus(projects);
+                    return " Exiting disply projects by status..."; // not yet implemented
                 case "6":
                     return " You have selected -> Manage individual projects"; // not yet implemented
                 case "7":
@@ -58,11 +61,11 @@ namespace Project_manager_app
             Console.Clear();
             Console.WriteLine($"\n DISPLAY ALL PROJECTS\n");
 
-            if (projects.Count == 0) 
+            if (projects.Count == 0)
                 Console.WriteLine(" Oh no, seems like you don't have any projects created.\n You can create one by choosing option 2 in the main menu.\n");
             else
                 Printer.PrintProjectsAndTasks(projects);
-            
+
             Console.WriteLine("\n Press any key to continue...");
             Console.ReadKey();
             Console.Clear();
@@ -75,7 +78,7 @@ namespace Project_manager_app
             var creationSuccess = HandleProjectCreation(ref projects);
 
             Console.Clear();
-            Console.WriteLine(creationSuccess ? "\n CREATE NEW PROJECT SUCCESS\n\n Your project has been created successfully.\n\n Press any key to continue..." 
+            Console.WriteLine(creationSuccess ? "\n CREATE NEW PROJECT SUCCESS\n\n Your project has been created successfully.\n\n Press any key to continue..."
                 : "\n CREATE NEW PROJECT ERROR\n\n An error has occured! Your project hasn't been created. Be careful with data input.\n\n Press any key to continue...");
             Console.ReadKey();
         }
@@ -105,14 +108,14 @@ namespace Project_manager_app
         public void EvaluateProjectDeletionSuccess(ref Dictionary<Project, List<Task>> projects)
         {
             Console.Clear();
-            if (projects.Count == 0) 
+            if (projects.Count == 0)
             {
                 Console.WriteLine("\n DELETE PROJECT\n\n There is no projects to delete.\n\n Press any key to continue...");
                 Console.ReadKey();
                 return;
             }
             var deletionSuccess = DeleteProject(ref projects);
-            
+
             Console.Clear();
             Console.WriteLine(deletionSuccess ? "\n DELETE PROJECT SUCCESS\n\n Selected project has been deleted successfully.\n\n Press any key to continue..."
                 : "\n DELETE PROJECT ERROR\n\n An error has occured or the project deletion has been abandoned! Your project hasn't been deleted.\n\n Press any key to continue...");
@@ -126,6 +129,64 @@ namespace Project_manager_app
             if (projectInfo == null) return false;
 
             return projects.Remove(projectInfo);
+        }
+
+        // Display all tasks within 7 days section
+
+        public void DisplayTasksInNextSevenDays(Dictionary<Project, List<Task>> projects)
+        {
+            Console.Clear();
+            Console.WriteLine("\n DISPLAY TASKS IN NEXT 7 DAYS\n\n");
+
+            var isThereAnyTasks = false;
+
+            foreach (var taskList in projects.Values)
+            {
+                foreach (var task in taskList)
+                {
+                    if (DateTime.Now < task.Deadline && DateTime.Now.AddDays(7.0) > task.Deadline)
+                    {
+                        Printer.PrintTask(task);
+                        isThereAnyTasks = true;
+                    }
+                }
+            }
+
+            if (!isThereAnyTasks)
+                Console.WriteLine("\n There is no tasks to display.");
+
+            Console.WriteLine("\n \n Press any key to continue...");
+            Console.ReadKey();
+        }
+
+        // Display projects filtered by status
+
+        public void DisplayProjectsByStatus(Dictionary<Project, List<Task>> projects)
+        {
+            Console.Clear();
+
+            if (projects.Count == 0)
+                Console.WriteLine("\n DISPLAY PROJECTS FILTERED BY STATUS\n\n There is no projects.");
+
+            var selectedStatus = GetUserInput.GetProjectStatus();
+
+            if (selectedStatus == null)
+            {
+                Console.Clear();
+                Console.WriteLine("\n Error while selecting project status!\n\n Press any key to continue...");
+                Console.ReadKey();
+            }
+
+            var selectedProjects = projects.Where(x => x.Key.Status == selectedStatus);
+
+            foreach (var project in selectedProjects)
+            {
+                Console.WriteLine("\n");
+                Printer.PrintProject(project);
+            }
+
+            Console.WriteLine("\n\n Press any key to continue...");
+            Console.ReadKey();
         }
     }
 }

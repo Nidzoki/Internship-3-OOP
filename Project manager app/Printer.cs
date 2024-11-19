@@ -63,5 +63,24 @@ namespace Project_manager_app
                     $"\n Status: {project.Key.Status}");
             }
         }
+
+        public static void PrintTask(Task task)
+        {
+            Console.WriteLine($" Task: {task.Name} - Description: {Printer.ShortDescription(task.Description)} - Deadline: {task.Deadline} - Duration(min): {task.DurationInMinutes} - Parent project: {task.ParentProject}");
+        }
+
+        public static string ShortDescription(string description)
+        {
+            return description.Length > 29 ? description.Substring(0, 30) + "..." : description;
+        }
+
+        public static void PrintProject(KeyValuePair<Project, List<Task>> project)
+        {
+            Console.WriteLine($" Project name: {project.Key.Name}" +
+                    $"\n Description: {project.Key.Description}" +
+                    $"\n Start date: {project.Key.StartDate:dd-mm-yyyy}" +
+                    $"\n End date: {project.Key.EndDate:dd-mm-yyyy}" +
+                    $"\n Status: {project.Key.Status}");
+        }
     }
 }

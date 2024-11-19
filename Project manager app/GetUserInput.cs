@@ -58,5 +58,24 @@ namespace Project_manager_app
                 return projects.Keys.ToList().Find(x => x.Name == projectName);
             return null;
         }
+    
+        public static ProjectStatus? GetProjectStatus()
+        {
+            Console.Clear();
+            Console.WriteLine("\n CHOOSE PROJECT STATUS\n\n 1. Active\n 2. Standby\n 3. Finished");
+            Console.Write(" Your input: ");
+
+            switch (Console.ReadLine().Trim())
+            {
+                case "1":
+                    return ProjectStatus.Active;
+                case "2":
+                    return ProjectStatus.Standby;
+                case "3":
+                    return ProjectStatus.Finished;
+                default:
+                    return null;
+            }
+        }
     }
 }
