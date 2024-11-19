@@ -34,7 +34,8 @@ namespace Project_manager_app
                     EvaluateProjectCreationSuccess(ref projects);
                     return " Exiting project creation...";
                 case "3":
-                    return " You have selected -> Delete a project"; // not yet implemented
+                    EvaluateProjectDeletionSuccess(ref projects);
+                    return " Exiting project deletion...";
                 case "4":
                     return " You have selected -> Show all tasks with a deadline in the next 7 days"; // not yet implemented
                 case "5":
@@ -81,7 +82,7 @@ namespace Project_manager_app
 
         public bool HandleProjectCreation(ref Dictionary<Project, List<Task>> projects)
         {
-            var newProjectData = GetNewProjectData();
+            var newProjectData = GetUserInput.GetNewProjectData();
 
             if (newProjectData == null)
                 return false;
@@ -99,36 +100,32 @@ namespace Project_manager_app
             return true;
         }
 
-        public Project GetNewProjectData()
+        // Project deletion section
+
+        public void EvaluateProjectDeletionSuccess(ref Dictionary<Project, List<Task>> projects)
         {
             Console.Clear();
-            Console.WriteLine("\n CREATE NEW PROJECT\n\n");
-            Console.Write(" Project name: ");
-            var projectName = Console.ReadLine().Trim();
-
-            if (projectName.Length == 0) 
-                return null;
-
-            Console.Write("\n\n Project description: ");
-            var projectDescription = Console.ReadLine().Trim();
-
-            try
+            if (projects.Count == 0) 
             {
-                Console.Write("\n\n Start date in dd-mm-yyyy format: ");
-                var startDate = DateTime.Parse(Console.ReadLine());
-
-                Console.Write("\n\n End date in dd-mm-yyyy format: ");                
-                var endDate = DateTime.Parse(Console.ReadLine());
-
-                if (startDate > endDate)
-                    return null;
-
-                return new Project(projectName, projectDescription, startDate, endDate);
+                Console.WriteLine("\n DELETE PROJECT\n\n There is no projects to delete.\n\n Press any key to continue...");
+                Console.ReadKey();
+                return;
             }
-            catch 
-            {
-                return null;
-            }
+            var deletionSuccess = DeleteProject(ref projects);
+            
+            Console.Clear();
+            Console.WriteLine(deletionSuccess ? "\n DELETE PROJECT SUCCESS\n\n Selected project has been deleted successfully.\n\n Press any key to continue..."
+                : "\n DELETE PROJECT ERROR\n\n An error has occured or the project deletion has been abandoned! Your project hasn't been deleted.\n\n Press any key to continue...");
+            Console.ReadKey();
+        }
+
+        public bool DeleteProject(ref Dictionary<Project, List<Task>> projects)
+        {
+            var projectInfo = GetUserInput.GetProjectToDelete(projects);
+
+            if (projectInfo == null) return false;
+
+            return projects.Remove(projectInfo);
         }
     }
 }
