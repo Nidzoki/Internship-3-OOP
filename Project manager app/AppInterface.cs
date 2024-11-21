@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Project_manager_app
@@ -42,8 +43,9 @@ namespace Project_manager_app
                     return " Exiting next 7 days tasks display...";
                 case "5":
                     DisplayProjectsByStatus(projects);
-                    return " Exiting disply projects by status..."; // not yet implemented
+                    return " Exiting disply projects by status...";
                 case "6":
+                    ManageIndividualProject(ref projects);
                     return " You have selected -> Manage individual projects"; // not yet implemented
                 case "7":
                     return " You have selected -> Manage individual tasks";
@@ -131,7 +133,7 @@ namespace Project_manager_app
             return projects.Remove(projectInfo);
         }
 
-        // Display all tasks within 7 days section
+        // Display all tasks within 7 days section !!!!!!! needs to be tested
 
         public void DisplayTasksInNextSevenDays(Dictionary<Project, List<Task>> projects)
         {
@@ -159,7 +161,7 @@ namespace Project_manager_app
             Console.ReadKey();
         }
 
-        // Display projects filtered by status
+        // Display projects filtered by status section
 
         public void DisplayProjectsByStatus(Dictionary<Project, List<Task>> projects)
         {
@@ -186,6 +188,72 @@ namespace Project_manager_app
             }
 
             Console.WriteLine("\n\n Press any key to continue...");
+            Console.ReadKey();
+        }
+
+        // Manage individual projects section
+
+        public void ManageIndividualProject(ref Dictionary<Project, List<Task>> projects)
+        {
+            var project = GetUserInput.GetProjectToManage(projects);
+
+            if (project == null)
+                return;
+
+            Console.Clear();
+            Printer.PrintProjectManagementOptions();
+
+            switch (Console.ReadLine().Trim()) 
+            {
+                case "1": 
+                    Printer.PrintTasksInsideProjects(projects, project);
+                    break;
+                case "2": // look into this later, might need a more sophisticated function 
+                    Console.Clear();
+                    Printer.PrintProject(new KeyValuePair<Project, List<Task>>(project, projects[project]));
+                    Console.WriteLine("\n Press any key to continue...");
+                    Console.ReadKey();
+                    break;
+                case "3": 
+                    HandleProjectStatusUpdate(ref projects, project);
+                    break;
+                case "4": // Add new task to the project
+                    break;
+                case "5": // Remove task from project
+                    break;
+                case "6": // Project duration expected 
+                    break;
+                default: // Error
+                    break;
+            }
+        }
+
+        public void HandleProjectStatusUpdate(ref Dictionary<Project, List<Task>> projects, Project project)
+        {
+            var status = GetUserInput.GetProjectStatus();
+            
+            if (status == null)
+            {
+                Console.WriteLine("\n ERROR!\n\n Status is invalid!\n\n Press any key to continue...");
+                Console.ReadKey();
+                return;
+            }
+            Console.Clear();
+            Console.WriteLine("\n\n CHANGE PROJECT STATUS\n\n Are you sure you want to change status of {0} to {1}? (y/n)", project.Name, status);
+
+            if (Console.ReadLine().Trim() != "y")
+            {
+                Console.WriteLine("\n Abandoning action.\n\n Press any key to continue...");
+                Console.ReadKey();
+            }
+
+            var projectValue = projects[project];
+            projects.Remove(project);
+            project.UpdateProjectStatus((ProjectStatus)status);
+            projects[project] = projectValue;
+
+            Console.Clear();
+            Console.WriteLine("\n\n CHANGE PROJECT STATUS\n\n Status successfully changed!\n\n Press any key to continue...");
             Console.ReadKey();
         }
     }

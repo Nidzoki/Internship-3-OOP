@@ -77,5 +77,24 @@ namespace Project_manager_app
                     return null;
             }
         }
+    
+        public static Project GetProjectToManage(Dictionary<Project, List<Task>> projects)
+        {
+            Console.Clear();
+            Console.WriteLine("\n MANAGE SPECIFIC PROJECT\n\n ");
+            Printer.PrintProjects(projects);
+            Console.Write("\n Input the project name or x to exit: ");
+
+            var projectName = Console.ReadLine().Trim();
+
+            if (projectName == "x" || !projects.Keys.Select(x => x.Name).Contains(projectName)) return null;
+
+            Console.WriteLine("\n Are you sure you want to manage project {0} (y/n)?", projectName);
+            Console.Write(" Your input: ");
+
+            if (Console.ReadLine() == "y")
+                return projects.Keys.ToList().Find(x => x.Name == projectName);
+            return null;
+        }
     }
 }

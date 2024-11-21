@@ -27,5 +27,10 @@ namespace Project_manager_app
         {
             Console.WriteLine($" Project name: {Name}\n Description: {Description}\n Start date: {StartDate:dd/mm/yyyy}\n End date: {EndDate:dd/mm/yyyy}\n Status: {Status}");
         }
+
+        public void UpdateProjectStatus(ProjectStatus status)
+        {
+            Status = status;
+        }
     }
 }

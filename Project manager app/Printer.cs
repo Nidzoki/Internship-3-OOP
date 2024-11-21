@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
+using System.Net.NetworkInformation;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -81,6 +83,37 @@ namespace Project_manager_app
                     $"\n Start date: {project.Key.StartDate:dd-mm-yyyy}" +
                     $"\n End date: {project.Key.EndDate:dd-mm-yyyy}" +
                     $"\n Status: {project.Key.Status}");
+        }
+
+        public static void PrintProjectManagementOptions() 
+        {
+            Console.WriteLine(" MANAGE SPECIFIC PROJECT\n\n" 
+                + " 1. Display all tasks within a selected project\n" 
+                + " 2. Show details of the selected project\n" 
+                + " 3. Edit the status of the project\n" 
+                + " 4. Add a task within the project\n"
+                + " 5. Delete a task from the project\n"
+                + " 6. Show the total expected time needed for all active tasks in the project\n\n");
+
+            Console.Write(" Your input: ");
+        }
+
+        public static void PrintTasksInsideProjects(Dictionary<Project, List<Task>> projects, Project project)
+        {
+            Console.Clear();
+            Console.WriteLine("\n PRINT TASKS INSIDE PROJECT\n");
+            if (projects[project].Count == 0)
+                Console.WriteLine(" There is no tasks to display.\n\n Press any key to continue...");
+            else
+            {
+                Console.WriteLine(" Tasks in {1}:\n", project.Name);
+                foreach (var task in projects[project])
+                {
+                    Console.WriteLine($"\tTask name: {task.Name}");
+                }
+                Console.WriteLine("\n Press any key to continue...");
+            }
+            Console.ReadKey();
         }
     }
 }
