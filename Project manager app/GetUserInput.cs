@@ -10,32 +10,51 @@ namespace Project_manager_app
         {
             Console.Clear();
             Console.WriteLine("\n CREATE NEW PROJECT\n\n");
-            Console.Write(" Project name: ");
-            var projectName = Console.ReadLine().Trim();
 
-            if (projectName.Length == 0)
-                return null;
+            string projectName;
+            do
+            {
+                Console.Write(" Project name: ");
+                projectName = Console.ReadLine().Trim();
+
+                if (string.IsNullOrEmpty(projectName))
+                    Console.WriteLine("Project name cannot be empty. Please enter a valid name.");
+            } while (string.IsNullOrEmpty(projectName));
 
             Console.Write("\n\n Project description: ");
             var projectDescription = Console.ReadLine().Trim();
 
-            try
+            DateTime startDate = DateTime.Now;
+            var askForStartDate = true;
+            while (askForStartDate)
             {
-                Console.Write("\n\n Start date in dd-mm-yyyy format: ");
-                var startDate = DateTime.Parse(Console.ReadLine());
+                Console.Write("\n\n Start date in dd-MM-yyyy format: ");
+                var dateInput = Console.ReadLine().Trim();
 
-                Console.Write("\n\n End date in dd-mm-yyyy format: ");
-                var endDate = DateTime.Parse(Console.ReadLine());
-
-                if (startDate > endDate)
-                    return null;
-
-                return new Project(projectName, projectDescription, startDate, endDate);
+                if (DateTime.TryParse(dateInput, out startDate))
+                    askForStartDate = false;
+                else
+                    Console.WriteLine("Invalid date format. Please enter the date in the format dd-MM-yyyy.");
             }
-            catch
+
+            DateTime endDate = DateTime.Now;
+            var askForEndDate = true;
+            while (askForEndDate)
             {
-                return null;
+                Console.Write("\n\n End date in dd-MM-yyyy format: ");
+                var dateInput = Console.ReadLine().Trim();
+
+                if (DateTime.TryParse(dateInput, out endDate))
+                {
+                    if (endDate >= startDate)
+                        askForEndDate = false;
+                    else
+                        Console.WriteLine("End date cannot be before the start date. Please enter a valid end date.");
+                }
+                else
+                    Console.WriteLine("Invalid date format. Please enter the date in the format dd-MM-yyyy.");
             }
+            return new Project(projectName, projectDescription, startDate, endDate);
         }
 
         public static Project GetProjectToDelete(Dictionary<Project, List<Task>> projects)
@@ -43,56 +62,107 @@ namespace Project_manager_app
             Console.Clear();
             Console.WriteLine("\n DELETE PROJECT\n\n ");
             Printer.PrintProjects(projects);
-            Console.Write("\n Input the project name or x to exit: ");
 
-            var projectName = Console.ReadLine().Trim();
+            Project selectedProject = null;
 
-            if(projectName == "x" || !projects.Keys.Select(x => x.Name).Contains(projectName)) return null;
-
-            Console.WriteLine("\n Are you sure you want to delete project named {0} (y/n)?", projectName);
-            Console.Write(" Your input: ");
-
-            if (Console.ReadLine() == "y")
-                return projects.Keys.ToList().Find(x => x.Name == projectName);
-            return null;
-        }
-    
-        public static ProjectStatus? GetProjectStatus()
-        {
-            Console.Clear();
-            Console.WriteLine("\n CHOOSE PROJECT STATUS\n\n 1. Active\n 2. Standby\n 3. Finished");
-            Console.Write(" Your input: ");
-
-            switch (Console.ReadLine().Trim())
+            var askForName = true;
+            while (askForName)
             {
-                case "1":
-                    return ProjectStatus.Active;
-                case "2":
-                    return ProjectStatus.Standby;
-                case "3":
-                    return ProjectStatus.Finished;
-                default:
+                Console.Write("\n Input the project name or x to exit: ");
+                var projectName = Console.ReadLine().Trim();
+
+                if (projectName.ToLower() == "x")
                     return null;
+
+                selectedProject = projects.Keys.FirstOrDefault(x => x.Name.Equals(projectName, StringComparison.OrdinalIgnoreCase));
+
+                if (selectedProject != null)
+                    askForName = false;
+
+                Console.WriteLine("Project name not found. Please try again.");
+            }
+
+            while (true)
+            {
+                Console.WriteLine($"\n Are you sure you want to delete the project named {selectedProject.Name} (y/n)?");
+                Console.Write(" Your input: ");
+                var confirmation = Console.ReadLine().Trim().ToLower();
+
+                if (confirmation == "y")
+                    return selectedProject;
+                else if (confirmation == "n")
+                    return null;
+
+                Console.WriteLine("Invalid input. Please enter 'y' or 'n'.");
             }
         }
-    
+
+        public static ProjectStatus GetProjectStatus()
+        {
+            while (true)
+            {
+                Console.Clear();
+                Console.WriteLine("\n CHOOSE PROJECT STATUS\n\n 1. Active\n 2. Standby\n 3. Finished");
+                Console.Write(" Your input: ");
+
+                switch (Console.ReadLine().Trim())
+                {
+                    case "1":
+                        return ProjectStatus.Active;
+                    case "2":
+                        return ProjectStatus.Standby;
+                    case "3":
+                        return ProjectStatus.Finished;
+                    default:
+                        Console.WriteLine("Invalid input. Please enter 1, 2, or 3.");
+                        Console.WriteLine("Press any key to try again...");
+                        Console.ReadKey();
+                        break;
+                }
+            }
+        }
+
         public static Project GetProjectToManage(Dictionary<Project, List<Task>> projects)
         {
             Console.Clear();
             Console.WriteLine("\n MANAGE SPECIFIC PROJECT\n\n ");
             Printer.PrintProjects(projects);
-            Console.Write("\n Input the project name or x to exit: ");
 
-            var projectName = Console.ReadLine().Trim();
+            Project selectedProject = null;
+            var askForName = true;
+            while (askForName)
+            {
+                Console.Write("\n Input the project name or x to exit: ");
+                var projectName = Console.ReadLine().Trim();
 
-            if (projectName == "x" || !projects.Keys.Select(x => x.Name).Contains(projectName)) return null;
+                if (projectName.ToLower() == "x")
+                    return null;
 
-            Console.WriteLine("\n Are you sure you want to manage project {0} (y/n)?", projectName);
-            Console.Write(" Your input: ");
+                selectedProject = projects.Keys.FirstOrDefault(x => x.Name == projectName);
 
-            if (Console.ReadLine() == "y")
-                return projects.Keys.ToList().Find(x => x.Name == projectName);
-            return null;
+                if (selectedProject != null)
+                    askForName = false;
+
+                Console.WriteLine("Project name not found. Please try again.");
+            }
+
+            while (true)
+            {
+                Console.WriteLine($"\n Are you sure you want to manage project {selectedProject.Name} (y/n)?");
+                Console.Write(" Your input: ");
+                var confirmation = Console.ReadLine().Trim().ToLower();
+
+                if (confirmation == "y")
+                {
+                    return selectedProject;
+                }
+                else if (confirmation == "n")
+                {
+                    return null;
+                }
+
+                Console.WriteLine("Invalid input. Please enter 'y' or 'n'.");
+            }
         }
 
         public static Task GetTaskData(string parentProject)
@@ -107,9 +177,8 @@ namespace Project_manager_app
                 name = Console.ReadLine().Trim();
 
                 if (string.IsNullOrEmpty(name))
-                {
                     Console.WriteLine("Task name cannot be empty. Please enter a valid name.");
-                }
+
             } while (string.IsNullOrEmpty(name));
 
             Console.Write("\n\n Task description: ");
@@ -117,33 +186,33 @@ namespace Project_manager_app
 
             var priority = GetUserInput.GetTaskPriority();
 
-            DateTime date;
-            do
+            DateTime date = DateTime.Now;
+            var askForDate = true;
+            while (askForDate)
             {
                 Console.Write("\n\n Task deadline (format: dd-MM-yyyy): ");
                 var dateInput = Console.ReadLine().Trim();
 
-                if (!DateTime.TryParse(dateInput, out _))
-                {
+                if (DateTime.TryParse(dateInput, out date))
+                    askForDate = false;
+                else
                     Console.WriteLine("Invalid date format. Please enter the date in the format dd-MM-yyyy.");
-                }
-            } while (!DateTime.TryParse(Console.ReadLine().Trim(), out date));
+            }
 
-            int duration;
-            do
+            int duration = 0;
+            var askForDuration = true;
+            while (askForDuration)
             {
                 Console.Write("\n\n Task duration (in minutes): ");
                 var durationInput = Console.ReadLine().Trim();
 
-                if (!int.TryParse(durationInput, out _))
-                {
+                if (int.TryParse(durationInput, out duration))
+                    askForDuration = false;
+                else
                     Console.WriteLine("Invalid duration format. Please enter the duration as an integer.");
-                }
-            } while (!int.TryParse(Console.ReadLine().Trim(), out duration));
-
+            }
             return new Task(name, parentProject, date, duration, description, priority);
         }
-
 
         private static PriorityLevel GetTaskPriority()
         {
@@ -171,22 +240,42 @@ namespace Project_manager_app
 
             Console.WriteLine(" List of tasks in this project:\n");
             foreach (var task in tasks)
-            {
                 Printer.PrintTask(task);
-            }
-            Console.Write(" Enter task name to delete it: ");
-            var name = Console.ReadLine().Trim();
 
-            if (name == string.Empty || !tasks.Select(x => x.Name).Contains(name))
-                return null;
+            string taskName = string.Empty;
+            Task selectedTask = null;
 
-            Console.Clear();
-            Console.WriteLine("\n DELETE TASK\n\n Are you sure you want to delete task named {0}? (y/n)", name);
-            if (Console.ReadLine().Trim() != "y")
+            var askForName = true;
+            while (askForName)
             {
-                return null;
+                Console.Write(" Enter task name to delete it or x to exit: ");
+                taskName = Console.ReadLine().Trim();
+
+                if (taskName.ToLower() == "x")
+                    return null;
+
+                selectedTask = tasks.FirstOrDefault(t => t.Name.Equals(taskName, StringComparison.OrdinalIgnoreCase));
+
+                if (selectedTask != null)
+                    askForName = false;
+
+                Console.WriteLine("Task name not found. Please try again.");
             }
-            return tasks.Find(x => x.Name == name);
+
+            while (true)
+            {
+                Console.Clear();
+                Console.WriteLine("\n DELETE TASK\n\n Are you sure you want to delete task named {0}? (y/n)", taskName);
+                Console.Write(" Your input: ");
+                var confirmation = Console.ReadLine().Trim().ToLower();
+
+                if (confirmation == "y")
+                    return selectedTask;
+                else if (confirmation == "n")
+                    return null;
+
+                Console.WriteLine("Invalid input. Please enter 'y' or 'n'.");
+            }
         }
 
         public static Task GetTaskToManage(Dictionary<Project, List<Task>> projects)
@@ -194,54 +283,79 @@ namespace Project_manager_app
             Console.Clear();
             Console.WriteLine("\n MANAGE TASK\n\n Tasks: \n");
 
-            foreach (var project in projects) 
+            var taskListsThatHaveTasks = projects.Values.Where(x => x.Count > 0).Count();
+
+            if (taskListsThatHaveTasks == 0)
+            {
+                Console.WriteLine("\n There is no tasks to manage.\n\n Press any key to continue...");
+                Console.ReadKey();
+                return null;
+            }
+
+            foreach (var project in projects)
             {
                 foreach (var task in project.Value)
-                {
                     Printer.PrintTask(task);
-                }
             }
 
-            Console.Write("\n Input the task name or x to exit: ");
-
-            var taskName = Console.ReadLine().Trim();
-
-            if (taskName == "x" || !projects.Values
-                .SelectMany(x => x).Select(x => x.Name)
-                .ToList().Contains(taskName)) return null;
-
-            Console.WriteLine("\n Are you sure you want to manage task {0} (y/n)?", taskName);
-            Console.Write(" Your input: ");
-
-            if (Console.ReadLine() == "y")
+            string taskName;
+            Task selectedTask = null;
+            var askForTaskName = true;
+            while (askForTaskName)
             {
-                foreach(var taskList in projects.Values)
-                {
-                    var task = taskList.FirstOrDefault(x => x.Name == taskName);
-                    if (task != null)
-                        return task;
-                }
+                Console.Write("\n Input the task name or x to exit: ");
+                taskName = Console.ReadLine().Trim();
+
+                if (taskName.ToLower() == "x")
+                    return null;
+
+                selectedTask = projects.Values
+                    .SelectMany(taskList => taskList)
+                    .FirstOrDefault(task => task.Name.Equals(taskName, StringComparison.OrdinalIgnoreCase));
+
+                if (selectedTask != null)
+                    askForTaskName = false;
+
+                Console.WriteLine("Task name not found. Please try again.");
             }
-                
-            return null;
+
+            while (true)
+            {
+                Console.WriteLine($"\n Are you sure you want to manage task {selectedTask.Name} (y/n)?");
+                Console.Write(" Your input: ");
+                var confirmation = Console.ReadLine().Trim().ToLower();
+
+                if (confirmation == "y")
+                    return selectedTask;
+                else if (confirmation == "n")
+                    return null;
+
+                Console.WriteLine("Invalid input. Please enter 'y' or 'n'.");
+            }
         }
 
-        public static TaskStatus? GetTaskStatus()
+        public static TaskStatus GetTaskStatus()
         {
-            Console.Clear();
-            Console.WriteLine("\n CHOOSE TASK STATUS\n\n 1. Active\n 2. Postponed\n 3. Finished");
-            Console.Write(" Your input: ");
-
-            switch (Console.ReadLine().Trim())
+            while (true)
             {
-                case "1":
-                    return TaskStatus.Active;
-                case "2":
-                    return TaskStatus.Postponed;
-                case "3":
-                    return TaskStatus.Finished;
-                default:
-                    return null;
+                Console.Clear();
+                Console.WriteLine("\n CHOOSE TASK STATUS\n\n 1. Active\n 2. Postponed\n 3. Finished");
+                Console.Write(" Your input: ");
+
+                switch (Console.ReadLine().Trim())
+                {
+                    case "1":
+                        return TaskStatus.Active;
+                    case "2":
+                        return TaskStatus.Postponed;
+                    case "3":
+                        return TaskStatus.Finished;
+                    default:
+                        Console.WriteLine("Invalid input. Please enter 1, 2, or 3.");
+                        Console.WriteLine("Press any key to try again...");
+                        Console.ReadKey();
+                        break;
+                }
             }
         }
     }

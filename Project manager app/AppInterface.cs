@@ -39,7 +39,7 @@ namespace Project_manager_app
                     EvaluateProjectDeletionSuccess(ref projects);
                     return " Exiting project deletion...";
                 case "4":
-                    DisplayTasksInNextSevenDays(projects); // needs to be tested when add tasks has been implemented
+                    DisplayTasksInNextSevenDays(projects);
                     return " Exiting next 7 days tasks display...";
                 case "5":
                     DisplayProjectsByStatus(projects);
@@ -176,13 +176,6 @@ namespace Project_manager_app
 
             var selectedStatus = GetUserInput.GetProjectStatus();
 
-            if (selectedStatus == null)
-            {
-                Console.Clear();
-                Console.WriteLine("\n Error while selecting project status!\n\n Press any key to continue...");
-                Console.ReadKey();
-            }
-
             var selectedProjects = projects.Where(x => x.Key.Status == selectedStatus);
 
             foreach (var project in selectedProjects)
@@ -195,10 +188,18 @@ namespace Project_manager_app
             Console.ReadKey();
         }
 
-        // Manage individual projects section ||||||||||||||| NEEDS TO BE TESTED AND REFURBISHED
+        // Manage individual projects section
 
         public void ManageIndividualProject(ref Dictionary<Project, List<Task>> projects)
         {
+            if (projects.Count == 0)
+            {
+                Console.WriteLine("\n MANAGE INDIVIDUAL PROJECT\n\n There is no projects to manage.\n\n Press any key to continue...");
+                Console.ReadKey();
+                return;
+            }
+            
+
             var project = GetUserInput.GetProjectToManage(projects);
 
             if (project == null)
@@ -293,12 +294,6 @@ namespace Project_manager_app
         {
             var status = GetUserInput.GetProjectStatus();
             
-            if (status == null)
-            {
-                Console.WriteLine("\n ERROR!\n\n Status is invalid!\n\n Press any key to continue...");
-                Console.ReadKey();
-                return;
-            }
             Console.Clear();
             Console.WriteLine("\n\n CHANGE PROJECT STATUS\n\n Are you sure you want to change status of {0} to {1}? (y/n)", project.Name, status);
 
@@ -322,6 +317,12 @@ namespace Project_manager_app
 
         private void ManageIndividualTasks(ref Dictionary<Project, List<Task>> projects)
         {
+            if (projects.Count == 0)
+            {
+                Console.WriteLine("\n MANAGE INDIVIDUAL TASKS\n\n There is no tasks to manage.\n\n Press any key to continue...");
+                Console.ReadKey();
+                return;
+            }
             var taskData = GetUserInput.GetTaskToManage(projects);
 
             Printer.PrintTaskManagementOptions();
@@ -353,14 +354,7 @@ namespace Project_manager_app
                 return;
             }
             var newStatus = GetUserInput.GetTaskStatus();
-            if (newStatus != null)
-            {
-                Console.Clear();
-                Console.WriteLine(" EDIT TASK STATUS\n\n An error has occured!\n\n Press any key to continue...");
-                Console.ReadKey();
-                return;
-            }
-
+            
                 Console.Clear();
             Console.WriteLine("\n EDIT TASK STATUS\n\n Are you sure you want to set status of task {0} to {1}? (y/n)", taskData.Name, newStatus );
             if (Console.ReadLine().Trim() != "y")
