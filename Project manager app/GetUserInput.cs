@@ -142,8 +142,8 @@ namespace Project_manager_app
 
                 if (selectedProject != null)
                     askForName = false;
-
-                Console.WriteLine("Project name not found. Please try again.");
+                else
+                    Console.WriteLine("Project name not found. Please try again.");
             }
 
             while (true)

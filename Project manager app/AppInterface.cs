@@ -212,7 +212,7 @@ namespace Project_manager_app
                 case "1": 
                     Printer.PrintTasksInsideProjects(projects, project);
                     break;
-                case "2": // look into this later, might need a more sophisticated function 
+                case "2":
                     Console.Clear();
                     Printer.PrintProject(new KeyValuePair<Project, List<Task>>(project, projects[project]));
                     Console.WriteLine("\n Press any key to continue...");
@@ -224,7 +224,7 @@ namespace Project_manager_app
                 case "4":
                     HandleAddNewTask(ref projects, project);
                     break;
-                case "5": // Remove task from project
+                case "5":
                     HandleRemoveTask(ref projects, project);
                     break;
                 case "6":
@@ -244,6 +244,13 @@ namespace Project_manager_app
 
         private void HandleRemoveTask(ref Dictionary<Project, List<Task>> projects, Project project)
         {
+            if (project.Status == ProjectStatus.Finished)
+            {
+                Console.Clear();
+                Console.WriteLine("\n This project is finished. You cannot delete tasks. \n\n Press any key to continue...");
+                Console.ReadKey();
+                return;
+            }
             Task taskData = GetUserInput.GetTaskToRemove(projects[project]);
             if (taskData == null)
             {
@@ -262,6 +269,13 @@ namespace Project_manager_app
 
         private void HandleAddNewTask(ref Dictionary<Project, List<Task>> projects, Project project)
         {
+            if (project.Status == ProjectStatus.Finished)
+            {
+                Console.Clear();
+                Console.WriteLine("\n This project is finished. You cannot add new tasks. \n\n Press any key to continue...");
+                Console.ReadKey();
+                return;
+            }
             var newTaskData = GetUserInput.GetTaskData(project.Name);
             if (newTaskData == null)
             {
@@ -313,35 +327,60 @@ namespace Project_manager_app
             Console.ReadKey();
         }
 
+        
+
         // Manage individual tasks section
 
-        private void ManageIndividualTasks(ref Dictionary<Project, List<Task>> projects)
+        public void ManageIndividualTasks(ref Dictionary<Project, List<Task>> projects)
         {
             if (projects.Count == 0)
             {
-                Console.WriteLine("\n MANAGE INDIVIDUAL TASKS\n\n There is no tasks to manage.\n\n Press any key to continue...");
+                Console.WriteLine("\n MANAGE INDIVIDUAL TASKS\n\n There are no tasks to manage.\n\n Press any key to continue...");
                 Console.ReadKey();
                 return;
             }
+
             var taskData = GetUserInput.GetTaskToManage(projects);
+
+            if (taskData == null)
+            {
+                Console.WriteLine("\n No valid task selected.\n\n Press any key to continue...");
+                Console.ReadKey();
+                return;
+            }
 
             Printer.PrintTaskManagementOptions();
 
-            switch (Console.ReadLine().Trim())
+            string option = string.Empty;
+            var askForOption = true;
+            while (askForOption)
             {
-                case "1": // display task details
-                    Console.Clear();
-                    Printer.PrintTask(taskData);
-                    Console.WriteLine("Press any key to continue...");
-                    Console.ReadKey();
+                option = Console.ReadLine().Trim();
+                if (option == "1" || option == "2")
+                    askForOption = false;
+                else
+                {
+                    Console.WriteLine("Invalid input. Please enter 1 or 2.");
+                }
+            }
+
+            switch (option)
+            {
+                case "1":
+                    HandlePrintTaskDetails(taskData);
                     break;
-                case "2": // edit task status
+                case "2": 
                     HandleEditTaskStatus(ref projects, taskData);
                     break;
-                default:
-                    // display error yet to implement
-                    break;
             }
+        }
+
+        public static void HandlePrintTaskDetails(Task taskData)
+        {
+            Console.Clear();
+            Printer.PrintTask(taskData);
+            Console.WriteLine("Press any key to continue...");
+            Console.ReadKey();
         }
 
         private void HandleEditTaskStatus(ref Dictionary<Project, List<Task>> projects, Task taskData)
@@ -354,9 +393,9 @@ namespace Project_manager_app
                 return;
             }
             var newStatus = GetUserInput.GetTaskStatus();
-            
-                Console.Clear();
-            Console.WriteLine("\n EDIT TASK STATUS\n\n Are you sure you want to set status of task {0} to {1}? (y/n)", taskData.Name, newStatus );
+
+            Console.Clear();
+            Console.WriteLine("\n EDIT TASK STATUS\n\n Are you sure you want to set status of task {0} to {1}? (y/n)", taskData.Name, newStatus);
             if (Console.ReadLine().Trim() != "y")
             {
                 Console.Clear();
@@ -365,7 +404,7 @@ namespace Project_manager_app
                 return;
             }
             var parentProject = projects.Keys.ToList().Find(x => x.Name == taskData.ParentProject);
-            if (parentProject != null)
+            if (parentProject == null)
             {
                 Console.Clear();
                 Console.WriteLine(" EDIT TASK STATUS\n\n An error has occured!\n\n Press any key to continue...");
@@ -402,6 +441,27 @@ namespace Project_manager_app
                     break;
             }
         }
+       
+        private void HandleDisplayAllTasksByDuration(Dictionary<Project, List<Task>>.ValueCollection values)
+        {
+            Console.Clear();
+            var allTasks = values.SelectMany(x => x).Select(x => x);
+
+            Console.WriteLine("\n DISPLAY TASKS SORTED BY DURATION\n\n All tasks:\n ");
+
+            if (allTasks.Count() == 0)
+            {
+                Console.WriteLine("\n There is no tasks to display.\n\n Press any key to continue...");
+                Console.ReadKey();
+                return;
+            }
+            foreach (var task in allTasks.OrderBy(x => x.DurationInMinutes))
+            {
+                Printer.PrintTask(task);
+            }
+            Console.WriteLine("\n Press any key to continue...");
+            Console.ReadKey();
+        }
 
         private void HandleDisplayTasksByPriority(Dictionary<Project, List<Task>>.ValueCollection values)
         {
@@ -425,25 +485,5 @@ namespace Project_manager_app
 
         }
 
-        private void HandleDisplayAllTasksByDuration(Dictionary<Project, List<Task>>.ValueCollection values)
-        {
-            Console.Clear();
-            var allTasks = values.SelectMany(x => x).Select(x => x);
-
-            Console.WriteLine("\n DISPLAY TASKS SORTED BY DURATION\n\n All tasks:\n ");
-
-            if (allTasks.Count() == 0)
-            {
-                Console.WriteLine("\n There is no tasks to display.\n\n Press any key to continue...");
-                Console.ReadKey();
-                return;
-            }
-            foreach (var task in allTasks.OrderBy(x => x.DurationInMinutes))
-            {
-                Printer.PrintTask(task);
-            }
-            Console.WriteLine("\n Press any key to continue...");
-            Console.ReadKey();
-        }
     }
 }

@@ -32,10 +32,6 @@ namespace Project_manager_app
             foreach (var project in projects)
             {
                 Console.WriteLine($" Project name: {project.Key.Name}" +
-                    $"\n Description: {project.Key.Description}" +
-                    $"\n Start date: {project.Key.StartDate:dd-mm-yyyy}" +
-                    $"\n End date: {project.Key.EndDate:dd-mm-yyyy}" +
-                    $"\n Status: {project.Key.Status}" +
                     $"\n Tasks:");
 
                 if (project.Value.Count == 0){
@@ -45,12 +41,7 @@ namespace Project_manager_app
 
                 foreach (var task in project.Value)
                 {
-                    Console.WriteLine($"\n\tTask name: {task.Name}" +
-                        $"\n\tDescription: {task.Description}" +
-                        $"\n\tDeadline: {task.Deadline}" +
-                        $"\n\tStatus: {task.Status}" +
-                        $"\n\tExpected duration time: {task.DurationInMinutes}" +
-                        $"\n\tParent project: {task.ParentProject}\n");
+                    Console.WriteLine($"\tTask name: {task.Name}");
                 }
             }
         }
@@ -59,17 +50,16 @@ namespace Project_manager_app
         {
             foreach (var project in projects)
             {
-                Console.WriteLine($" Project name: {project.Key.Name}" +
-                    $"\n Description: {project.Key.Description}" +
-                    $"\n Start date: {project.Key.StartDate:dd-mm-yyyy}" +
-                    $"\n End date: {project.Key.EndDate:dd-mm-yyyy}" +
-                    $"\n Status: {project.Key.Status}");
+                Console.WriteLine($" Project name: {project.Key.Name} |" +
+                    $" Start date: {project.Key.StartDate:dd-mm-yyyy} |" +
+                    $" End date: {project.Key.EndDate:dd-mm-yyyy} |" +
+                    $" Status: {project.Key.Status}");
             }
         }
 
         public static void PrintTask(Task task)
         {
-            Console.WriteLine($" Task: {task.Name} - Description: {Printer.ShortDescription(task.Description)} - Priority: {task.Priority} - Deadline: {task.Deadline} - Duration(min): {task.DurationInMinutes} - Parent project: {task.ParentProject}\n");
+            Console.WriteLine($" Task: {task.Name} - Description: {Printer.ShortDescription(task.Description)} - Priority: {task.Priority} - Deadline: {task.Deadline} - Duration(min): {task.DurationInMinutes} - Parent project: {task.ParentProject} - Status: {task.Status}\n");
         }
 
         public static string ShortDescription(string description)
@@ -108,7 +98,7 @@ namespace Project_manager_app
                 Console.WriteLine(" There is no tasks to display.\n\n Press any key to continue...");
             else
             {
-                Console.WriteLine(" Tasks in {1}:\n", project.Name);
+                Console.WriteLine(" Tasks in {0}:\n", project.Name);
                 foreach (var task in projects[project])
                 {
                     Console.WriteLine($"\tTask name: {task.Name}");
@@ -121,13 +111,15 @@ namespace Project_manager_app
         public static void PrintTaskManagementOptions()
         {
             Console.Clear();
-            Console.WriteLine("\n MANAGE SPPECIFIC TASK \n\n 1. Display task details\n 2. Edit task status\n");
+            Console.WriteLine("\n MANAGE SPPECIFIC TASK \n\n 1. Display task details\n 2. Edit task status\n\n");
+            Console.Write(" Your input: ");
         }
 
         public static void PrintBonusMenu()
         {
             Console.Clear();
             Console.WriteLine("\n BONUS SUBMENU\n\n 1. Display tasks sorted by duration\n 2. Sort tasks by priority\n");
+            Console.Write("\n Your input: ");
         }
     }
 }
