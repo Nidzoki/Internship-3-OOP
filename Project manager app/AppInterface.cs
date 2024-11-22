@@ -16,7 +16,7 @@ namespace Project_manager_app
         {
             Printer.PrintMainMenu(false);
 
-            string[] mainMenuOptions = new string[] { "1", "2", "3", "4", "5", "6", "7", "8" };
+            string[] mainMenuOptions = new string[] { "1", "2", "3", "4", "5", "6", "7", "8", "9" };
 
             var input = Console.ReadLine();
 
@@ -43,13 +43,17 @@ namespace Project_manager_app
                     return " Exiting next 7 days tasks display...";
                 case "5":
                     DisplayProjectsByStatus(projects);
-                    return " Exiting disply projects by status...";
+                    return " Exiting display projects by status...";
                 case "6":
                     ManageIndividualProject(ref projects);
-                    return " You have selected -> Manage individual projects"; // not yet implemented
+                    return " Exiting manage individual projects...";
                 case "7":
-                    return " You have selected -> Manage individual tasks";
+                    ManageIndividualTasks(ref projects);
+                    return " Exiting manage individual tasks...";
                 case "8":
+                    ManageBonusFunctionality(projects);
+                    return "Exiting bonus functionality...";
+                case "9":
                     return "Exit";
                 default:
                     return " Error!";
@@ -191,7 +195,7 @@ namespace Project_manager_app
             Console.ReadKey();
         }
 
-        // Manage individual projects section
+        // Manage individual projects section ||||||||||||||| NEEDS TO BE TESTED AND REFURBISHED
 
         public void ManageIndividualProject(ref Dictionary<Project, List<Task>> projects)
         {
@@ -200,7 +204,6 @@ namespace Project_manager_app
             if (project == null)
                 return;
 
-            Console.Clear();
             Printer.PrintProjectManagementOptions();
 
             switch (Console.ReadLine().Trim()) 
@@ -312,6 +315,126 @@ namespace Project_manager_app
 
             Console.Clear();
             Console.WriteLine("\n\n CHANGE PROJECT STATUS\n\n Status successfully changed!\n\n Press any key to continue...");
+            Console.ReadKey();
+        }
+
+        // Manage individual tasks section
+
+        private void ManageIndividualTasks(ref Dictionary<Project, List<Task>> projects)
+        {
+            var taskData = GetUserInput.GetTaskToManage(projects);
+
+            Printer.PrintTaskManagementOptions();
+
+            switch (Console.ReadLine().Trim())
+            {
+                case "1": // display task details
+                    Console.Clear();
+                    Printer.PrintTask(taskData);
+                    Console.WriteLine("Press any key to continue...");
+                    Console.ReadKey();
+                    break;
+                case "2": // edit task status
+                    HandleEditTaskStatus(ref projects, taskData);
+                    break;
+                default:
+                    // display error yet to implement
+                    break;
+            }
+        }
+
+        private void HandleEditTaskStatus(ref Dictionary<Project, List<Task>> projects, Task taskData)
+        {
+            if (taskData.Status == TaskStatus.Finished)
+            {
+                Console.Clear();
+                Console.WriteLine(" EDIT TASK STATUS\n\n An error has occured! This task is already finished and you can no longer change its status.\n\n Press any key to continue...");
+                Console.ReadKey();
+                return;
+            }
+            var newStatus = GetUserInput.GetTaskStatus();
+            if (newStatus != null)
+            {
+                Console.Clear();
+                Console.WriteLine(" EDIT TASK STATUS\n\n An error has occured!\n\n Press any key to continue...");
+                Console.ReadKey();
+                return;
+            }
+
+                Console.Clear();
+            Console.WriteLine("\n EDIT TASK STATUS\n\n Are you sure you want to set status of task {0} to {1}? (y/n)", taskData.Name, newStatus );
+            if (Console.ReadLine().Trim() != "y")
+            {
+                Console.Clear();
+                Console.WriteLine(" EDIT TASK STATUS\n\n Exiting...\n\n Press any key to continue...");
+                Console.ReadKey();
+                return;
+            }
+            var parentProject = projects.Keys.ToList().Find(x => x.Name == taskData.ParentProject);
+            if (parentProject != null)
+            {
+                Console.Clear();
+                Console.WriteLine(" EDIT TASK STATUS\n\n An error has occured!\n\n Press any key to continue...");
+                Console.ReadKey();
+                return;
+            }
+            projects[parentProject][projects[parentProject].FindIndex(x => x == taskData)].Status = (TaskStatus)newStatus;
+            if (projects[parentProject].All(x => x.Status == TaskStatus.Finished))
+            {
+                var values = projects[parentProject];
+                projects.Remove(parentProject);
+                parentProject.Status = ProjectStatus.Finished;
+                projects[parentProject] = values;
+            }
+            Console.Clear();
+            Console.WriteLine(" EDIT TASK STATUS\n\n Task status updated sucessfully!" +
+                (parentProject.Status == ProjectStatus.Finished ? "\n\n Good news! Your project is now finished!" : "") + "\n\n Press any key to continue...");
+            Console.ReadKey();
+        }
+
+        // Bonus functionality
+
+        public void ManageBonusFunctionality(Dictionary<Project, List<Task>> projects)
+        {
+            Printer.PrintBonusMenu();
+
+            switch (Console.ReadLine().Trim()) 
+            {
+                case "1":
+                    HandleDisplayAllTasksByDuration(projects.Values);
+                    break;
+                case "2":
+                    HandleDisplayTasksByPriority(projects.Values);
+                    break;
+            }
+        }
+
+        private void HandleDisplayTasksByPriority(Dictionary<Project, List<Task>>.ValueCollection values)
+        {
+            Console.Clear();
+            var allTasks = values.SelectMany(x => x).Select(x => x);
+
+            Console.WriteLine("\n DISPLAY TASKS SORTED BY PRIORITY\n\n All tasks:\n ");
+            foreach (var task in allTasks.OrderBy(x => x.Priority))
+            {
+                Printer.PrintTask(task);
+            }
+            Console.WriteLine("\n Press any key to continue...");
+            Console.ReadKey();
+
+        }
+
+        private void HandleDisplayAllTasksByDuration(Dictionary<Project, List<Task>>.ValueCollection values)
+        {
+            Console.Clear();
+            var allTasks = values.SelectMany(x => x).Select(x => x);
+
+            Console.WriteLine("\n DISPLAY TASKS SORTED BY DURATION\n\n All tasks:\n ");
+            foreach (var task in allTasks.OrderBy(x => x.DurationInMinutes))
+            {
+                Printer.PrintTask(task);
+            }
+            Console.WriteLine("\n Press any key to continue...");
             Console.ReadKey();
         }
     }

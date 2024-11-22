@@ -22,7 +22,8 @@ namespace Project_manager_app
             " 5. Display projects filtered by status\n" +
             " 6. Manage individual projects\n" +
             " 7. Manage individual tasks\n" +
-            " 8. Exit");
+            " 8. Bonus functionality\n" +
+            " 9. Exit");
             Console.Write("\n Your input: ");
         }
 
@@ -68,7 +69,7 @@ namespace Project_manager_app
 
         public static void PrintTask(Task task)
         {
-            Console.WriteLine($" Task: {task.Name} - Description: {Printer.ShortDescription(task.Description)} - Deadline: {task.Deadline} - Duration(min): {task.DurationInMinutes} - Parent project: {task.ParentProject}");
+            Console.WriteLine($" Task: {task.Name} - Description: {Printer.ShortDescription(task.Description)} - Priority: {task.Priority} - Deadline: {task.Deadline} - Duration(min): {task.DurationInMinutes} - Parent project: {task.ParentProject}\n");
         }
 
         public static string ShortDescription(string description)
@@ -87,7 +88,8 @@ namespace Project_manager_app
 
         public static void PrintProjectManagementOptions() 
         {
-            Console.WriteLine(" MANAGE SPECIFIC PROJECT\n\n" 
+            Console.Clear();
+            Console.WriteLine("\n MANAGE SPECIFIC PROJECT\n\n" 
                 + " 1. Display all tasks within a selected project\n" 
                 + " 2. Show details of the selected project\n" 
                 + " 3. Edit the status of the project\n" 
@@ -114,6 +116,18 @@ namespace Project_manager_app
                 Console.WriteLine("\n Press any key to continue...");
             }
             Console.ReadKey();
+        }
+
+        public static void PrintTaskManagementOptions()
+        {
+            Console.Clear();
+            Console.WriteLine("\n MANAGE SPPECIFIC TASK \n\n 1. Display task details\n 2. Edit task status\n");
+        }
+
+        public static void PrintBonusMenu()
+        {
+            Console.Clear();
+            Console.WriteLine("\n BONUS SUBMENU\n\n 1. Display tasks sorted by duration\n 2. Sort tasks by priority\n");
         }
     }
 }

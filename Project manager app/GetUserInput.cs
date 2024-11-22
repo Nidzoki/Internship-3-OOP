@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Project_manager_app
 {
@@ -101,26 +99,68 @@ namespace Project_manager_app
         {
             Console.Clear();
             Console.WriteLine("\n CREATE NEW TASK\n\n");
-            Console.Write(" Task name: ");
-            var name = Console.ReadLine().Trim();
-            
-            if (name == string.Empty)
-                return null;
+
+            string name;
+            do
+            {
+                Console.Write(" Task name: ");
+                name = Console.ReadLine().Trim();
+
+                if (string.IsNullOrEmpty(name))
+                {
+                    Console.WriteLine("Task name cannot be empty. Please enter a valid name.");
+                }
+            } while (string.IsNullOrEmpty(name));
 
             Console.Write("\n\n Task description: ");
             var description = Console.ReadLine().Trim();
-            try
-            {
-                Console.Write("\n\n Task deadline in format dd-mm-yyyy: ");
-                var date = DateTime.Parse(Console.ReadLine().Trim());
 
-                Console.Write("\n\n Task duration in format dd-mm-yyyy: ");
-                var duration = int.Parse(Console.ReadLine().Trim());
-                return new Task(name, parentProject, date, duration, description);
-            }
-            catch
+            var priority = GetUserInput.GetTaskPriority();
+
+            DateTime date;
+            do
             {
-                return null;
+                Console.Write("\n\n Task deadline (format: dd-MM-yyyy): ");
+                var dateInput = Console.ReadLine().Trim();
+
+                if (!DateTime.TryParse(dateInput, out _))
+                {
+                    Console.WriteLine("Invalid date format. Please enter the date in the format dd-MM-yyyy.");
+                }
+            } while (!DateTime.TryParse(Console.ReadLine().Trim(), out date));
+
+            int duration;
+            do
+            {
+                Console.Write("\n\n Task duration (in minutes): ");
+                var durationInput = Console.ReadLine().Trim();
+
+                if (!int.TryParse(durationInput, out _))
+                {
+                    Console.WriteLine("Invalid duration format. Please enter the duration as an integer.");
+                }
+            } while (!int.TryParse(Console.ReadLine().Trim(), out duration));
+
+            return new Task(name, parentProject, date, duration, description, priority);
+        }
+
+
+        private static PriorityLevel GetTaskPriority()
+        {
+            Console.Clear();
+            Console.WriteLine("\n CHOOSE TASK PRIORITY\n\n 1. High\n 2. Medium\n 3. Low (default)\n\n");
+            Console.Write(" Your input: ");
+
+            switch (Console.ReadLine().Trim())
+            {
+                case "1":
+                    return PriorityLevel.High;
+                case "2":
+                    return PriorityLevel.Medium;
+                case "3":
+                    return PriorityLevel.Low;
+                default:
+                    return PriorityLevel.Low;
             }
         }
 
@@ -147,6 +187,62 @@ namespace Project_manager_app
                 return null;
             }
             return tasks.Find(x => x.Name == name);
+        }
+
+        public static Task GetTaskToManage(Dictionary<Project, List<Task>> projects)
+        {
+            Console.Clear();
+            Console.WriteLine("\n MANAGE TASK\n\n Tasks: \n");
+
+            foreach (var project in projects) 
+            {
+                foreach (var task in project.Value)
+                {
+                    Printer.PrintTask(task);
+                }
+            }
+
+            Console.Write("\n Input the task name or x to exit: ");
+
+            var taskName = Console.ReadLine().Trim();
+
+            if (taskName == "x" || !projects.Values
+                .SelectMany(x => x).Select(x => x.Name)
+                .ToList().Contains(taskName)) return null;
+
+            Console.WriteLine("\n Are you sure you want to manage task {0} (y/n)?", taskName);
+            Console.Write(" Your input: ");
+
+            if (Console.ReadLine() == "y")
+            {
+                foreach(var taskList in projects.Values)
+                {
+                    var task = taskList.FirstOrDefault(x => x.Name == taskName);
+                    if (task != null)
+                        return task;
+                }
+            }
+                
+            return null;
+        }
+
+        public static TaskStatus? GetTaskStatus()
+        {
+            Console.Clear();
+            Console.WriteLine("\n CHOOSE TASK STATUS\n\n 1. Active\n 2. Postponed\n 3. Finished");
+            Console.Write(" Your input: ");
+
+            switch (Console.ReadLine().Trim())
+            {
+                case "1":
+                    return TaskStatus.Active;
+                case "2":
+                    return TaskStatus.Postponed;
+                case "3":
+                    return TaskStatus.Finished;
+                default:
+                    return null;
+            }
         }
     }
 }

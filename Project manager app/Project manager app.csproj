@@ -46,6 +46,7 @@
     <Compile Include="AppInterface.cs" />
     <Compile Include="GetUserInput.cs" />
     <Compile Include="Printer.cs" />
+    <Compile Include="PriorityLevel.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Project.cs" />
     <Compile Include="ProjectStatus.cs" />

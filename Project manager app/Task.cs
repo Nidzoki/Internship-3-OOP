@@ -14,8 +14,9 @@ namespace Project_manager_app
         public TaskStatus Status { get; set; }
         public int DurationInMinutes { get; set; }
         public string ParentProject { get; set; }
+        public PriorityLevel Priority { get; set; }
 
-        public Task(string taskName, string parentProjectName, DateTime deadline, int duration = 0, string description = "")
+        public Task(string taskName, string parentProjectName, DateTime deadline, int duration = 0, string description = "", PriorityLevel priority = PriorityLevel.Low)
         {
             Name = taskName;
             Description = description;
@@ -23,6 +24,7 @@ namespace Project_manager_app
             Status = TaskStatus.Active;
             DurationInMinutes = duration;
             ParentProject = parentProjectName;
+            Priority = priority;
         }
     }
 }
