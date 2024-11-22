@@ -218,14 +218,59 @@ namespace Project_manager_app
                     HandleProjectStatusUpdate(ref projects, project);
                     break;
                 case "4": // Add new task to the project
+                    HandleAddNewTask(ref projects, project);
                     break;
                 case "5": // Remove task from project
+                    HandleRemoveTask(ref projects, project);
                     break;
                 case "6": // Project duration expected 
+                    HandleProjectDuration(projects, project);
                     break;
                 default: // Error
                     break;
             }
+        }
+
+        private void HandleProjectDuration(Dictionary<Project, List<Task>> projects, Project project)
+        {
+            Console.Clear();
+            Console.WriteLine(" \n PROJECT DURATION\n\n Project task count = {0}\n Estimated duration time = {1}\n\n Press any key to continue...", projects[project].Count, projects[project].Select(x => x.DurationInMinutes).Sum());
+            Console.ReadKey();
+        }
+
+        private void HandleRemoveTask(ref Dictionary<Project, List<Task>> projects, Project project)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void HandleAddNewTask(ref Dictionary<Project, List<Task>> projects, Project project)
+        {
+            var newTaskData = GetUserInput.GetTaskData(project.Name);
+            if (newTaskData == null)
+            {
+                Console.Clear();
+                Console.WriteLine("\n Exiting new task creation...\n\n Press any key to continue...");
+                Console.ReadKey();
+                return;
+            }
+            if (projects[project].Select(x => x.Name).Contains(newTaskData.Name))
+            {
+                Console.Clear();
+                Console.WriteLine("\n ERROR: Task with the same name already exists!\n\n Press any key to continue...");
+                Console.ReadKey();
+                return;
+            }
+            if (project.StartDate > newTaskData.Deadline || project.EndDate < newTaskData.Deadline)
+            {
+                Console.Clear();
+                Console.WriteLine("\n ERROR: Task deadline is out of the bounds of project!\n\n Press any key to continue...");
+                Console.ReadKey();
+                return;
+            }
+            projects[project].Add(newTaskData);
+            Console.Clear();
+            Console.WriteLine("\n CREATE NEW TASK\n\n New task has been created successfuly!\n\n Press any key to continue...");
+            Console.ReadKey();
         }
 
         public void HandleProjectStatusUpdate(ref Dictionary<Project, List<Task>> projects, Project project)
@@ -249,7 +294,7 @@ namespace Project_manager_app
 
             var projectValue = projects[project];
             projects.Remove(project);
-            project.UpdateProjectStatus((ProjectStatus)status);
+            project.Status = (ProjectStatus)status;
             projects[project] = projectValue;
 
             Console.Clear();

@@ -15,16 +15,14 @@ namespace Project_manager_app
         public int DurationInMinutes { get; set; }
         public string ParentProject { get; set; }
 
-        public Task(string taskName, string parentProjectName)
+        public Task(string taskName, string parentProjectName, DateTime deadline, int duration = 0, string description = "")
         {
             Name = taskName;
-            Description = string.Empty;
-            Deadline = DateTime.Now.Date;
+            Description = description;
+            Deadline = deadline;
             Status = TaskStatus.Active;
-            DurationInMinutes = 0;
+            DurationInMinutes = duration;
             ParentProject = parentProjectName;
-
         }
-
     }
 }

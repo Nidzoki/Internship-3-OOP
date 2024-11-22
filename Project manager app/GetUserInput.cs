@@ -96,5 +96,32 @@ namespace Project_manager_app
                 return projects.Keys.ToList().Find(x => x.Name == projectName);
             return null;
         }
+
+        public static Task GetTaskData(string parentProject)
+        {
+            Console.Clear();
+            Console.WriteLine("\n CREATE NEW TASK\n\n");
+            Console.Write(" Task name: ");
+            var name = Console.ReadLine().Trim();
+            
+            if (name == string.Empty)
+                return null;
+
+            Console.Write("\n\n Task description: ");
+            var description = Console.ReadLine().Trim();
+            try
+            {
+                Console.Write("\n\n Task deadline in format dd-mm-yyyy: ");
+                var date = DateTime.Parse(Console.ReadLine().Trim());
+
+                Console.Write("\n\n Task duration in format dd-mm-yyyy: ");
+                var duration = int.Parse(Console.ReadLine().Trim());
+                return new Task(name, parentProject, date, duration, description);
+            }
+            catch
+            {
+                return null;
+            }
+        }
     }
 }
