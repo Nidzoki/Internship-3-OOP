@@ -409,6 +409,13 @@ namespace Project_manager_app
             var allTasks = values.SelectMany(x => x).Select(x => x);
 
             Console.WriteLine("\n DISPLAY TASKS SORTED BY PRIORITY\n\n All tasks:\n ");
+
+            if (allTasks.Count() == 0)
+            {
+                Console.WriteLine("\n There is no tasks to display.\n\n Press any key to continue...");
+                Console.ReadKey();
+                return;
+            }
             foreach (var task in allTasks.OrderBy(x => x.Priority))
             {
                 Printer.PrintTask(task);
@@ -424,6 +431,13 @@ namespace Project_manager_app
             var allTasks = values.SelectMany(x => x).Select(x => x);
 
             Console.WriteLine("\n DISPLAY TASKS SORTED BY DURATION\n\n All tasks:\n ");
+
+            if (allTasks.Count() == 0)
+            {
+                Console.WriteLine("\n There is no tasks to display.\n\n Press any key to continue...");
+                Console.ReadKey();
+                return;
+            }
             foreach (var task in allTasks.OrderBy(x => x.DurationInMinutes))
             {
                 Printer.PrintTask(task);
