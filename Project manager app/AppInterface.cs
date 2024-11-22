@@ -217,16 +217,16 @@ namespace Project_manager_app
                 case "3": 
                     HandleProjectStatusUpdate(ref projects, project);
                     break;
-                case "4": // Add new task to the project
+                case "4":
                     HandleAddNewTask(ref projects, project);
                     break;
                 case "5": // Remove task from project
                     HandleRemoveTask(ref projects, project);
                     break;
-                case "6": // Project duration expected 
+                case "6":
                     HandleProjectDuration(projects, project);
                     break;
-                default: // Error
+                default:
                     break;
             }
         }
@@ -240,7 +240,20 @@ namespace Project_manager_app
 
         private void HandleRemoveTask(ref Dictionary<Project, List<Task>> projects, Project project)
         {
-            throw new NotImplementedException();
+            Task taskData = GetUserInput.GetTaskToRemove(projects[project]);
+            if (taskData == null)
+            {
+                Console.Clear();
+                Console.WriteLine("\n ERROR: Task does not exist!\n\n Press any key to continue.");
+                Console.Read();
+                return;
+            }
+
+            projects[project].Remove(taskData);
+
+            Console.Clear();
+            Console.WriteLine("\n REMOVE TASK\n\n Task removed sucessfully! \n\n Press any key to continue.");
+            Console.Read();
         }
 
         private void HandleAddNewTask(ref Dictionary<Project, List<Task>> projects, Project project)

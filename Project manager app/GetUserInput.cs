@@ -123,5 +123,30 @@ namespace Project_manager_app
                 return null;
             }
         }
+
+        public static Task GetTaskToRemove(List<Task> tasks)
+        {
+            Console.Clear();
+            Console.WriteLine("\n DELETE TASK\n\n");
+
+            Console.WriteLine(" List of tasks in this project:\n");
+            foreach (var task in tasks)
+            {
+                Printer.PrintTask(task);
+            }
+            Console.Write(" Enter task name to delete it: ");
+            var name = Console.ReadLine().Trim();
+
+            if (name == string.Empty || !tasks.Select(x => x.Name).Contains(name))
+                return null;
+
+            Console.Clear();
+            Console.WriteLine("\n DELETE TASK\n\n Are you sure you want to delete task named {0}? (y/n)", name);
+            if (Console.ReadLine().Trim() != "y")
+            {
+                return null;
+            }
+            return tasks.Find(x => x.Name == name);
+        }
     }
 }
